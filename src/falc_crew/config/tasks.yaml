@@ -1,0 +1,122 @@
+translate_text_task:
+  description: >
+    Translate the following text into FALC using provided editorial and design rules.
+
+    1. First, consult the available icons list:
+      {icon_list}
+
+    2. Use only the icon keys listed above, in the format [[ICON:icon_key]].
+      Do NOT use emojis or invent new keys.
+      Do NOT add icons in header, recipient, subject or footer—only in body sections for alert / warning lines.
+
+    3. **Do NOT produce any Markdown tables** (no pipes `|`, no `---` separators).
+      Instead, whenever you have logistical data, emit each item as its own paragraph, for example:
+      ```
+      Quand: …
+      Où: …
+      Horaire: …
+      Transport: …
+      Règles: …
+      ```
+      And for multi-line schedules, each day-line must be its own paragraph immediately following the “Horaire:” paragraph.
+
+      This ensures the table optimizer can detect and tabulate them.
+
+    4. Use ReferenceModelRetriever to find a matching example, then rewrite in FALC following the rules — do not copy.
+
+    Text to translate:
+    {original_text}
+
+  expected_output: >
+    Return a dictionary with keys:
+      header, recipient, subject, body_sections, footer
+
+    - header, recipient, footer may be null if not needed.
+    - subject: the one-line subject.
+    - body_sections: a list of paragraphs; logistical fields (Quand, Où, Horaire, Transport, Règles) must each be their own paragraph.
+    - Only body_sections may contain [[ICON:…]] placeholders.
+
+  agent: falc_translator
+
+table_optimizer_task:
+  description: >
+    Review the FALC translator's `body_sections` and detect any blocks matching our three table patterns.
+
+    ***ONLY*** these tables:
+
+      • **Meeting Table** (“Détails de la réunion”):
+        - Columns: ["Élément", "Détails"]
+        - Rows for exactly: Quand, Où, Horaire, Transport, Règles
+
+      • **Legal Rules Table** (“Règles légales”):
+        - Columns: ["Article", "Description"]
+        - Example rows for: Article, Règle
+
+      • **Places Table** (“Liste des lieux”):
+        - Columns: ["Information", "Valeur"]
+        - Rows for: Contact, Adresse, Téléphone
+
+    When you find one of these:
+
+      1. Gather **all consecutive paragraphs** whose field-names match one of the row keys.
+      2. In `body_sections`, replace that entire group of paragraphs with a single `[[TABLE:<key>]]` placeholder.
+        Follow the FALC Guidelines for any text you place in the table.
+      3. **Remove** the FALC translator text markdown formatting if any (ex: |\n| --- | --- |\n|)
+      4. In `tables`, add an object:
+        • key: your_key
+        • title: the table title
+        • columns: the two headers
+        • rows: each row as `[first-column, combined second-column]`
+        • hide_column_headers: true
+      5. **Then scan the remaining `body_sections`** and **remove** any paragraph whose text exactly equals any second-column value you just placed into the table.
+        This ensures no duplicate text remains anywhere.
+
+    **Mandatory icons** in first-column labels for these situations:
+      - Quand
+      - Où
+      - Quoi (ou que faire)
+      - Horaire
+      - Transport
+      - Règles à respecter
+      - Avertissement
+
+    Keep any `[[ICON:…]]` markers in the text you move into the table.  Do not leave any of those paragraphs behind in `body_sections`.
+
+    Available icons:
+    {icon_list}
+
+  expected_output: >
+    Return a dictionary with exactly:
+      header, recipient, subject, body_sections, footer, tables
+
+    - In `body_sections`, each detected block is replaced by `[[TABLE:<key>]]`.
+    - No paragraph whose content appears in a table row may remain.
+    - In `tables`, each row's first element begins with its `[[ICON:key]]` placeholder.
+    - The “Règles” row's second-column entry must concatenate all rule paragraphs (with icons) into one cell.
+
+  agent: table_optimizer
+
+
+rewrite_original_doc_task:
+  description: >
+    Erase everything from paragraph index {replace_start} through {replace_end} (inclusive) in the original document,
+    then insert the FALC translation (subject + body sections + tables) in that region.
+
+    ***YOU MUST NOT*** modify the translations provided by the FALC translator.
+
+    The following values will be passed to the writer tool:
+    - header (optional)
+    - recipient (optional)
+    - subject
+    - body_sections
+    - tables (optional)
+    - replace_start
+    - replace_end
+    - output_dir: {output_dir}
+
+    Here's the original file path: {original_file}
+
+  expected_output: >
+    A .docx file rewritten in-place, saved as output/{session_id}/document_name_falc_TIMESTAMP.docx
+
+  agent: falc_document_designer
