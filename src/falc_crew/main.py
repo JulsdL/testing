@@ -14,19 +14,23 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-LANGFUSE_SECRET_KEY = os.getenv("LANGFUSE_SECRET_KEY")
-LANGFUSE_PUBLIC_KEY = os.getenv("LANGFUSE_PUBLIC_KEY")
-LANGFUSE_AUTH=base64.b64encode(f"{LANGFUSE_PUBLIC_KEY}:{LANGFUSE_SECRET_KEY}".encode()).decode()
-LANGFUSE_HOST = os.getenv("LANGFUSE_HOST", "https://api.langfuse.com")
+ENABLE_TELEMETRY = os.getenv("ENABLE_LANGFUSE_TELEMETRY", "false").lower() in ("1", "true", "yes")
 
-os.environ["OTEL_EXPORTER_OTLP_ENDPOINT"] = f"{LANGFUSE_HOST}/api/public/otel"
-os.environ["OTEL_EXPORTER_OTLP_HEADERS"] = f"Authorization=Basic {LANGFUSE_AUTH}"
-os.environ["OPENAI_API_KEY"]= os.getenv("OPENAI_API_KEY")
+if ENABLE_TELEMETRY:
 
-warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
+    LANGFUSE_SECRET_KEY = os.getenv("LANGFUSE_SECRET_KEY")
+    LANGFUSE_PUBLIC_KEY = os.getenv("LANGFUSE_PUBLIC_KEY")
+    LANGFUSE_AUTH=base64.b64encode(f"{LANGFUSE_PUBLIC_KEY}:{LANGFUSE_SECRET_KEY}".encode()).decode()
+    LANGFUSE_HOST = os.getenv("LANGFUSE_HOST", "https://cloud.langfuse.com")
 
-# Initialize OpenLit for telemetry
-openlit.init()
+    os.environ["OTEL_EXPORTER_OTLP_ENDPOINT"] = f"{LANGFUSE_HOST}/api/public/otel"
+    os.environ["OTEL_EXPORTER_OTLP_HEADERS"] = f"Authorization=Basic {LANGFUSE_AUTH}"
+    os.environ["OPENAI_API_KEY"]= os.getenv("OPENAI_API_KEY")
+
+    warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
+
+    # Initialize OpenLit for telemetry
+    openlit.init()
 
 
 @cl.step(name="📄 Lecture du document Word")

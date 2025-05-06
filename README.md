@@ -1,190 +1,265 @@
-# FalcCrew
+# Assistant FALC README
 
-Welcome to **FalcCrew**, a project that uses `crewAI` to simplify working with multi-agent AI systems. FalcCrew makes it easier to build, modify, and manage AI agents that collaborate on complex tasks.
+Bienvenue dans **Assistant FALC**, un service complet de simplification de documents Word (.docx) en langage FALC (Facile À Lire et à Comprendre).
+Cette documentation vous guide pas à pas pour installer, configurer et exploiter la plateforme, et explique comment un administrateur IT peut gérer les modèles de référence et les lignes directrices FALC.
 
----
+## Table des matières
 
-## Table of Contents
+1. [Présentation](#présentation)
+2. [Fonctionnalités clés](#fonctionnalités-clés)
+3. [Installation & Prérequis](#installation--prérequis)
+4. [Personnalisation](#personnalisation)
+   - [Agents & Tâches (YAML)](#agents--tâches-yaml)
+   - [Ajouter / Supprimer des modèles de référence](#ajouter--supprimer-des-modèles-de-référence)
+   - [Mettre à jour les lignes directrices FALC](#mettre-à-jour-les-lignes-directrices-falc)
+6. [Utilisation](#utilisation)
+   - [Interface Chainlit (Chat)](#interface-chainlit-chat)
+   - [Commandes CLI](#commandes-cli)
+7. [Description des fichiers](#description-des-fichiers)
+8. [Flux de traitement (sequence flow)](#flux-de-traitement-sequence-flow)
 
-- [Overview](#overview)
-- [Features](#features)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Usage](#usage)
-- [Chainlit Integration](#chainlit-integration)
-- [Project Structure](#project-structure)
-- [Testing](#testing)
-- [Support](#support)
-- [License](#license)
+## 1. Présentation
 
----
+**Assistant FALC** combine :
 
-## Overview
+- **Chainlit** : Interface chat et gestion de session
+- **CrewAI + OpenAI** : Orchestration d’agents spécialisés pour :
+  - Traduction
+  - Optimisation de tableaux
+  - Design
+- **python-docx** : Extraction et génération de documents Word
+- **Outils personnalisés (`custom_tool.py`)** :
+  - Extraction de texte
+  - Balisage de structure
+  - Insertion d’icônes et de tables
+  - RAG pour modèles de référence
 
-FalcCrew orchestrates multiple AI agents, each focused on specific tasks. These agents collaborate to produce simplified text documents using **FALC (Français Facile à Lire et à Comprendre)** guidelines. You can customize the agents, their tasks, and any specialized tools they require.
+L’objectif est de simplifier automatiquement vos lettres et formulaires administratifs en produisant un document Word conforme aux règles FALC.
 
----
+## 2. Fonctionnalités clés
 
-## Features
+- 💬 **Interface conversationnelle** : Déposez un `.docx`, récupérez le FALC traduit.
+- 🤖 **Multi-agent CrewAI** :
+  - Extraction du texte
+  - Détection de la zone à remplacer
+  - Traduction FALC
+  - Optimisation en tables
+  - Génération du `.docx` final
+- 📂 **Gestion des modèles de référence (RAG)**
+- 🛠️ **Personnalisation** : Ajout/suppression de modèles, mise à jour des directives
+- 🔧 **CLI pour entraînement du FALC Crew**
 
-- **Multi-Agent Collaboration**
-  Define and organize multiple AI agents to perform tasks in sequence or parallel.
+## 3. Installation & Prérequis
 
-- **Easy Configuration**
-  Control tasks, agents, and tools via YAML files (`src/falc_crew/config/`).
-
-- **Document Processing**
-  Extract text from `.docx` files, rewrite in FALC style, and embed custom icons.
-
-- **Chainlit Integration**
-  Debug and visualize task progress in real-time.
-
-- **Session Isolation**
-  Each user session handles its own uploads and outputs separately.
-
-- **Training Flow**
-  Optional training mode to refine how tasks are performed.
-
----
-
-## Installation
-
-### Prerequisites
-
-- **Python**: >= 3.10, < 3.13
-- **pip** or your preferred Python package manager
-
----
-
-### Steps
-
-#### 1. Clone the Repository
+### 1. Cloner le dépôt
 
 ```bash
-git clone https://github.com/<your_user>/falc_crew.git
+git clone https://github.com/JulsdL/falc_crew
 cd falc_crew
 ```
-#### 2. Install Dependencies
-FalcCrew uses UV for dependency management. If you don't have it installed:
+### 2. Python 3.12+ & pip
+Créer et activer un environnement virtuel :
 
+```bash
+python -m venv venv
+source venv/bin/activate    # macOS/Linux
+# ou
+venv\Scripts\activate       # Windows
+```
+
+### 3. Installer les dépendances
+FalcCrew utilise UV pour la gestion des dépendances. Si UV n’est pas installé :
 ```bash
 pip install uv
 ```
-
-Then, install the dependencies:
+Ensuite, installez les dépendances :
 
 ```bash
 uv install
 ```
-
-#### 3. Set Environment Variables
-
+### 4. Configurez les variables d’environnement
 ```bash
 cp .env_example .env
 ```
-
-Edit the .env file and add your required secrets, such as:
-
+Éditez le fichier .env et ajoutez vos secrets:
 ```bash
-OPENAI_API_KEY=your_openai_api_key
+OPENAI_API_KEY="sk-..."
+LANGFUSE_PUBLIC_KEY="pk_..."
+LANGFUSE_SECRET_KEY="sk-..."
+LANGFUSE_HOST="https://api.langfuse.com"
 ```
 
-## Configuration
+Vous pouvez créer votre compte Langfuse gratuitement ici : [Langfuse](https://cloud.langfuse.com/auth/sign-in).
 
-### Environment Variables
+## 4. Personnalisation
 
-Set the following in your local `.env` file:
+### Agents & Tâches (YAML)
 
-- `MODEL`
-  Example: `gpt-4.1-mini`
+Les **agents** et **tâches** sont configurés via deux fichiers YAML :
 
-- `OPENAI_API_KEY`
-  Example: `sk-<your-key>`
+| Fichier                  | Rôle                                      |
+|--------------------------|-------------------------------------------|
+| `config/agents.yaml`     | Déclare les **agents AI**                 |
+| `config/tasks.yaml`      | Décrit les **tâches** (« jobs ») à exécuter |
 
-- `LANGFUSE_SECRET_KEY`
+Modifiez-les pour ajuster prompts, rôles et workflow.
 
-- `LANGFUSE_PUBLIC_KEY`
-
-- `LANGFUSE_HOST`
-
----
-
-### Agents and Tasks
-
-Inside src/falc_crew/config:
-
-- agents.yaml: Describes each agent, its role, and the tools it can use.
-
-```	yaml
-falc_translator:
-  role: "FALC Translator"
-  goal: "Convert complex text into simpler FALC text..."
-  ...
-falc_document_designer:
-  role: "Accessible Document Designer"
-  ...
-```
-
-
-- tasks.yaml: Describes each task the crew will execute.
-```yaml
-translate_text_task:
-  description: "Translate given text to FALC..."
-  ...
-rewrite_original_doc_task:
-  description: "Update original doc with the FALC translation..."
-  ...
-```
-
-### Knowledge Sources
-
-Store all reference materials, icons, and domain-specific guidelines in the following directory:
-
-- src/falc_crew/knowledge_sources:
-  - icons.json: Maps icon keys to local image paths
-  - falc_guidelines.md: Contains FALC guidelines and rules.
-  - icons/: Directory for storing icon images.
-```
-
-## Usage
-
-### Running the Project
-
-From the root directory, run:
-
+### Ajouter / Supprimer des modèles de référence
+Les modèles de référence FALC (pour le RAG) sont stockés dans :
 ```bash
-crewai run
+data/reference_models/
 ```
+  - Ajouter : Déposez simplement votre fichier .docx dans ce dossier. Vérifier d'abord que le fichier ne contien pas de données sensible et qu'il s'ouvre correctement.
 
-This command launches the multi-agent flow defined in agents.yaml and tasks.yaml.
-- By default it processes .docx files.
-- Output is rewritten in FALC style.
+   -Supprimer : Retirez le fichier correspondant pour qu’il ne soit plus utilisé.
 
-### Customizing
+Note : Les changements sont pris en compte au redémarrage de l'application.
 
-**Change agent roles or add new agents**
-- Edit: src/falc_crew/config/agents.yaml
-
-**Define or modify task steps**
-- Edit: src/falc_crew/config/tasks.yaml
-
-**Add new tools**
-- Extend the src/falc_crew/tools/custom_tools.py file with new tool classes.
-
-### Training (Optional)
- - If you want to train or refine how the tasks are performed (for instance, to better adapt your FALC rewriting):
+### Mettre à jour les lignes directrices FALC
+Le guide éditorial FALC est situé dans :
 ```bash
-crewai train
+knowlegde/falc_guidelines.md
 ```
+  - Modifier : Ouvrez et éditez ce fichier pour ajuster vos règles (longueur de phrase, formatage, lexique, etc.).
 
-## Chainlit Integration
+  - Sauvegarder : La prochaine invocation de la Crew utilisera automatiquement la version mise à jour.
 
-Chainlit is used for an interactive interface that helps with debugging and workflow demonstration. You can:
-
-### 🏁 Start Chainlit by running:
-
-Run the following command:
-
+## 5. Utilisation
+Démarrer avec l'interface Chainlit (Front-end Chat)
 ```bash
 chainlit run src/chainlit_app.py
 ```
+1. Ouvrez http://localhost:8000.
+2. Déposez votre document .docx.
+3. Patientez (~1 min).
+4. Téléchargez le .docx FALC généré.
+
+
+## 6.Description des fichiers
+
+### chainlit_app.py
+
+| Élément          | Description                                                                 |
+|------------------|-----------------------------------------------------------------------------|
+| **But**          | Interface chat pour uploader un `.docx`, lancer la traduction & renvoyer le fichier FALC. |
+| **Librairie**    | `chainlit`                                                                  |
+| **Fonctions clés** | `on_chat_start`, `process_upload`, `on_message`, `end`                     |
+
+**Flux principal** :
+
+1. **Démarrage** (`@cl.on_chat_start`) :
+   - Génère un `session_id` (UUID).
+   - Crée `temp_uploads/<session_id>` et `output/<session_id>`.
+   - Accueil utilisateur et démarrage de l’upload.
+2. **Upload** (`process_upload`) :
+   - Invite l’utilisateur à copier-colle un `.docx`.
+   - Sauvegarde locale et message « Traitement en cours ».
+   - Appelle `run(file_path, output_dir)` (depuis `main.py`).
+   - Envoie le `.docx` FALC généré.
+   - Boucle pour un nouvel upload.
+3. **Fin de session** (`@cl.on_chat_end`) :
+   - Supprime les répertoires temporaires.
+
+### falc_crew/crew.py
+
+| Élément            | Description                                                                 |
+|--------------------|-----------------------------------------------------------------------------|
+| **But**            | Définition de la **Crew** : agents, tâches, processus.                      |
+| **Librairies**     | `crewai`, `crewai.project`                                                  |
+| **Classe**         | `FalcCrew(CrewBase)`                                                         |
+
+**Agents définis** :
+
+| Agent                         | Outils intégrés                                                        | Mémoire | Rôle rapide                               |
+|-------------------------------|------------------------------------------------------------------------|---------|--------------------------------------------|
+| `falc_translator`             | `FalcIconLookupTool`, `WordExtractorTool`, `ReferenceModelRetrieverTool` | ✔️      | Simplifier le texte en FALC                |
+| `table_optimizer`             | Aucun                                                                   | ✔️      | Repérer et transformer des blocs en tables |
+| `falc_document_designer`      | `FalcDocxWriterTool`                                                    | ✔️      | Générer le `.docx` final structuré         |
+
+**Tâches** :
+
+| Tâche                         | Description                                                         |
+|-------------------------------|---------------------------------------------------------------------|
+| `translate_text_task`         | Traduction en FALC                                                   |
+| `table_optimizer_task`        | Détection & remplacement par placeholders de tables                  |
+| `rewrite_original_doc_task`   | Réécriture du `.docx` original avec le contenu FALC                 |
+
+**Crew** :
+
+- **Processus** : Séquentiel (`Process.sequential`)
+- **Sources de connaissances** :
+  - `falc_guidelines.md` (règles éditoriales)
+  - `icons.json` (inventaire d’icônes)
+
+
+### main.py
+
+| Élément         | Description                                                      |
+|-----------------|------------------------------------------------------------------|
+| **But**         | Point d’entrée CLI & wrapper Chainlit pour lancer la **Crew**.  |
+| **Fonctions clés** | `extract_text`, `tag_structure`, `load_icon_list`, `run`, `train`, `replay`, `test` |
+| **Telemetry**   | Intégration **Langfuse** & **OpenLit**                           |
+
+#### Steps Chainlit
+
+Chaque étape annotée `@cl.step` :
+
+1. **📄 Lecture du document Word** : extraction du texte brut.
+2. **🔍 Analyse de la structure** : repérage des bornes à remplacer.
+3. **🔎 Chargement des icônes** : inventaire des icônes.
+4. **📄 Lancement Crew** : exécution asynchrone des agents.
+
+
+#### Commandes CLI
+
+```bash
+# Lancer l’UI Chainlit
+chainlit run chainlit_app.py
+
+# Entraînement de FALC Crew
+crewai train
+```
+
+### falc_crew/tools/custom_tool.py
+
+| Outil                             | Rôle                                                                                 |
+|-----------------------------------|--------------------------------------------------------------------------------------|
+| **WordExtractorTool**             | Extrait le texte brut d’un `.docx`.                                                  |
+| **FalcDocxStructureTaggerTool**   | Identifie les indices de paragraphes à remplacer.                                    |
+| **FalcIconLookupTool**            | Fournit la liste des icônes disponibles depuis `icons.json`.                         |
+| **FalcDocxWriterTool**            | Génère un `.docx` structuré : insertion d’icônes `[[ICON:…]]` et de tables `[[TABLE:…]]`. |
+| **ReferenceModelRetrieverTool**   | Outil RAG pour retrouver des modèles FALC de référence.                              |
+
+Chaque outil hérite de `BaseTool` ou `RagTool`, définit un schéma d’entrée (`args_schema`) et une méthode `_run()`.
+
+### config/agents.yaml
+
+| Agent                       | Rôle               | Objectif                                                    |
+|-----------------------------|--------------------|-------------------------------------------------------------|
+| `falc_translator`           | FALC Translator    | Simplifier un texte complexe en FALC.                       |
+| `table_optimizer`           | Table Optimizer    | Repérer les blocs logistiques et proposer des `[[TABLE:…]]`. |
+| `falc_document_designer`    | Doc Designer       | Produire le `.docx` final selon les normes typographiques.  |
+
+```yaml
+falc_translator:
+  role: >-
+    FALC Translator
+  goal: >-
+    Convert complex text into ...
+  backstory: >-
+    You're an expert in simplifying French ...
+...
+```
+
+### config/tasks.yaml
+
+| Tâche                        | Description                                                                                                                                       | Agent               |
+|------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| `translate_text_task`        | Traduire le texte, insérer icônes `[[ICON:…]]`, structurer en paragraphes pour le Table Optimizer.                                                | falc_translator     |
+| `table_optimizer_task`       | Regrouper les paragraphes logistiques en tables, remplacer dans `body_sections`, produire `tables` avec métadonnées.                              | table_optimizer     |
+| `rewrite_original_doc_task`  | Supprimer la zone d’origine (indices `replace_start` à `replace_end`), insérer header/subject/body/tables via `FalcDocxWriterTool`.              | falc_document_designer |
+
+---
+
+## 7. Flux de traitement
+![Flux de traitement FALC](flux_traitement_falc.svg)
