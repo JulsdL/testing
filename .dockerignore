@@ -1,0 +1,4 @@
+temp_uploads/
+output/
+.venv/
+__pycache__/

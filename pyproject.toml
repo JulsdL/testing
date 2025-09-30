@@ -1,0 +1,47 @@
+[project]
+name = "falc_crew"
+version = "0.0.1"
+description = "falc_crew using crewAI"
+authors = [{ name = "Julien de Lambilly", email = "" }]
+requires-python = ">=3.10,<3.13"
+dependencies = [
+  "crewai==0.108.0",
+  "crewai-tools==0.40.0",
+  "embedchain>=0.1.125",
+  "chromadb==0.5.23",
+  "transformers==4.51.3",
+  "openlit==1.33.19",
+  "python-docx>=1.1.2",
+  "chainlit>=2.4.400",
+  "langfuse>=2.60.3",
+  "onnxruntime>=1.21.0",
+  "importlib-resources>=6.5.2",
+  "pypika>=0.48.9",
+  "chroma-hnswlib>=0.7.6",
+  "docx2txt>=0.9",
+]
+
+[tool.uv]
+override-dependencies = [
+  # force the single version of tokenizers we want
+  "tokenizers>=0.21,<0.22",
+  "opentelemetry-instrumentation>=0.52b0,<1",
+]
+
+[[tool.uv.dependency-metadata]]
+name = "chromadb"
+requires-dist = ["tokenizers>=0.21,<0.22"]
+
+[project.scripts]
+falc_crew = "falc_crew.main:run"
+run_crew = "falc_crew.main:run"
+train = "falc_crew.main:train"
+replay = "falc_crew.main:replay"
+test = "falc_crew.main:test"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "crew"
