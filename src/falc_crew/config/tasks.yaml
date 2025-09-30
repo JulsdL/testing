@@ -135,49 +135,61 @@ table_optimizer_task:
     Review the FALC translator's `body_sections` and identify opportunities to restructure content into tables for improved clarity and readability, then define the table data.
     **VERY IMPORTANT: The final `body_sections` list you output MUST contain ALL original content that was NOT converted into a table, PLUS the `[[TABLE:key]]` placeholders for any tables you created. All items must be in their correct original relative order.**
 
-    **NEW CRITICAL RULE: SIMPLIFYING TABLES WITH QUESTION TITLES**
-    A common pattern is a question followed by a list of answers. When you identify this, you must simplify the table structure to its core information.
+    **NEW CRITICAL RULE: Advanced Table Structuring for Questions**
+    When you encounter a question in the text that is followed by content you intend to turn into a table, you MUST identify which of the two following patterns it matches and apply the correct procedure.
 
-    If a block of content you are converting to a table is immediately preceded by a paragraph that is a question (e.g., "Qui paie les frais pour les lunettes ?"), you MUST follow this procedure:
-    1.  **Use the question as the `title` for the table.**
-    2.  **Remove the question paragraph** from the `body_sections` along with the content being converted to a table.
-    3.  **Always hide the column headers** for this type of table by setting `hide_column_headers: true`. The title is sufficient.
-    4.  **Analyze and simplify the columns:**
-        a.  Examine the first column of your potential table. If its content is a simple, direct repetition of the question's theme (e.g., the title is "Qui paie les frais ?" and the first column only contains "Qui ?"), then this first column is redundant and **MUST BE ENTIRELY REMOVED** from the `rows` data.
-        b.  The result might be a table with only a single column, which is the desired outcome.
-        c.  However, if the first column contains essential non-redundant information (like step numbers: "1", "2", "3"), it should be kept.
+    ---
+    **Pattern 1: Simple Question & Answer (Key-Value Table)**
 
-    **Example of desired transformation:**
+    *   **When to use:** This pattern applies when a question is followed by a single, direct paragraph of text as an answer.
+    *   **Procedure:**
+        1.  Create a table with **NO `title`** (set `title: null`).
+        2.  Set `hide_column_headers: true`.
+        3.  The `rows` data must be a single list containing two items: `[[<question_text>, <answer_text>]]`.
+        4.  Both the question and the answer paragraphs must be removed from the `body_sections` and replaced with a single `[[TABLE:key]]`.
 
-    *Initial Text from Translator:*
-    ```
-    "Qui paie les frais pour les lunettes ?",
-    "Qui ?:",
-    "Notre établissement paie les lunettes...",
-    ```
+    *   **Example Transformation:**
+        *   **Initial Text:** `"Qui paie les lunettes ?", "L’EVAM paie les frais..."`
+        *   **Correct Table Output:**
+            ```json
+            {
+              "key": "paiement_lunettes",
+              "title": null,
+              "columns": ["", ""],
+              "rows": [
+                ["Qui paie les lunettes ?", "L’EVAM paie les frais..."]
+              ],
+              "hide_column_headers": true
+            }
+            ```
+    ---
+    **Pattern 2: Question & List/Steps (Titled List Table)**
 
-    *Your Correct Output:*
-    - `title`: "Qui paie les frais pour les lunettes ?"
-    - `hide_column_headers`: true
-    - `columns`: ["", ""]
-    - `rows`: [["Notre établissement paie les lunettes..."]]
+    *   **When to use:** This pattern applies when a question is followed by multiple distinct items, such as a numbered list, bullet points, or a series of steps.
+    *   **Procedure:**
+        1.  Use the question itself as the `title` for the table.
+        2.  Set `hide_column_headers: false` to ensure the column headers are visible and provide context for the list.
+        3.  The `columns` should be concise and descriptive headers (e.g., `["Étape", "Action"]`).
+        4.  The `rows` should contain the structured list items.
+        5.  The question paragraph and all the list item paragraphs must be removed from `body_sections` and replaced with a single `[[TABLE:key]]`.
 
-    **Another Example:**
-
-    *Initial Text from Translator:*
-    ```
-    "Que devez-vous faire ?",
-    "Étape 1:",
-    "Vous devez aller...",
-    "Étape 2:",
-    "Vous devez prendre...",
-    ```
-
-    *Your Correct Output:*
-    - `title`: "Que devez-vous faire ?"
-    - `hide_column_headers`: true
-    - `columns`: ["Étape", "Action"]
-    - `rows`: [["1", "Vous devez aller..."], ["2", "Vous devez prendre..."]]
+    *   **Example Transformation:**
+        *   **Initial Text:** `"Que devez-vous faire ?", "1. Vous devez aller...", "2. Vous devez prendre..."`
+        *   **Correct Table Output:**
+            ```json
+            {
+              "key": "demarches_lunettes",
+              "title": "Que devez-vous faire ?",
+              "columns": ["Étape", "Action"],
+              "rows": [
+                ["1", "Vous devez aller..."],
+                ["2", "Vous devez prendre..."]
+              ],
+              "hide_column_headers": false
+            }
+            ```
+    ---
+    **Crucial:** You must correctly identify the pattern and apply the corresponding procedure. Do not mix them. A simple question-answer pair should **never** have a title. A question-list pair should **always** have a title and visible headers.
 
      **1. Identify Content Suitable for Tables:**
       Actively look for various types of information that would benefit from a tabular presentation, such as:
