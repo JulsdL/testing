@@ -11,7 +11,13 @@ translate_text_task:
 
     **VERY IMPORTANT: You MUST consult and meticulously apply ALL rules from the 'Règles d'édition FALC' document (available in your knowledge base) for every sentence you write.**
     This includes specific instructions for sentence structure, vocabulary, numbers, dates, lists, complex structures (conditions, cause/effect, etc.), and forbidden phrases.
-    Pay special attention to the rule: "Si une phrase commence par 'si', poser la condition sous forme de question puis répondre avec 'Alors...'."
+
+    **KEY STYLE AND CONTENT RULES TO FOLLOW:**
+    - **No Summaries:** Absolutely do not add a summary or recap at the end of the document. The translation must end after the last piece of information.
+    - **Consistent Vocabulary (Isosemie):** Be extremely consistent with your choice of words. If you translate a term one way (e.g., "logement"), you must use that same word throughout the entire document. Do not use synonyms like "bail" or "appartement".
+    - **Sentence Starters:** Do not start sentences with "Ou", "Alors", or "Donc". The only exception is the "Question? Alors..." pattern for conditions.
+    - **No Subject Repetition:** Do not repeat the letter's subject in the first sentence. The first sentence should state the document's purpose directly.
+    - **Positive Phrasing:** Always prefer positive sentences. For example, instead of "Qui peut vous aider si vous avez des questions ?", write "Vous avez des questions ?".
 
     **All output sentences must be grammatically correct French, even when simplified.**
 
@@ -128,6 +134,50 @@ table_optimizer_task:
   description: >
     Review the FALC translator's `body_sections` and identify opportunities to restructure content into tables for improved clarity and readability, then define the table data.
     **VERY IMPORTANT: The final `body_sections` list you output MUST contain ALL original content that was NOT converted into a table, PLUS the `[[TABLE:key]]` placeholders for any tables you created. All items must be in their correct original relative order.**
+
+    **NEW CRITICAL RULE: SIMPLIFYING TABLES WITH QUESTION TITLES**
+    A common pattern is a question followed by a list of answers. When you identify this, you must simplify the table structure to its core information.
+
+    If a block of content you are converting to a table is immediately preceded by a paragraph that is a question (e.g., "Qui paie les frais pour les lunettes ?"), you MUST follow this procedure:
+    1.  **Use the question as the `title` for the table.**
+    2.  **Remove the question paragraph** from the `body_sections` along with the content being converted to a table.
+    3.  **Always hide the column headers** for this type of table by setting `hide_column_headers: true`. The title is sufficient.
+    4.  **Analyze and simplify the columns:**
+        a.  Examine the first column of your potential table. If its content is a simple, direct repetition of the question's theme (e.g., the title is "Qui paie les frais ?" and the first column only contains "Qui ?"), then this first column is redundant and **MUST BE ENTIRELY REMOVED** from the `rows` data.
+        b.  The result might be a table with only a single column, which is the desired outcome.
+        c.  However, if the first column contains essential non-redundant information (like step numbers: "1", "2", "3"), it should be kept.
+
+    **Example of desired transformation:**
+
+    *Initial Text from Translator:*
+    ```
+    "Qui paie les frais pour les lunettes ?",
+    "Qui ?:",
+    "Notre établissement paie les lunettes...",
+    ```
+
+    *Your Correct Output:*
+    - `title`: "Qui paie les frais pour les lunettes ?"
+    - `hide_column_headers`: true
+    - `columns`: ["", ""]
+    - `rows`: [["Notre établissement paie les lunettes..."]]
+
+    **Another Example:**
+
+    *Initial Text from Translator:*
+    ```
+    "Que devez-vous faire ?",
+    "Étape 1:",
+    "Vous devez aller...",
+    "Étape 2:",
+    "Vous devez prendre...",
+    ```
+
+    *Your Correct Output:*
+    - `title`: "Que devez-vous faire ?"
+    - `hide_column_headers`: true
+    - `columns`: ["Étape", "Action"]
+    - `rows`: [["1", "Vous devez aller..."], ["2", "Vous devez prendre..."]]
 
      **1. Identify Content Suitable for Tables:**
       Actively look for various types of information that would benefit from a tabular presentation, such as:
