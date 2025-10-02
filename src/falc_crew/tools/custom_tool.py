@@ -7,7 +7,7 @@ from typing import List, Optional, Type
 from pydantic import BaseModel, Field
 from datetime import datetime
 from docx import Document
-from docx.shared import Inches
+from docx.shared import Inches, Pt
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 
@@ -217,6 +217,7 @@ class FalcDocxWriterTool(BaseTool):
             if title:
                 self._clear_paragraph_formatting(paragraph)
                 self._insert_text_and_icons(paragraph, title, icons_map)
+                paragraph.paragraph_format.space_before = Pt(12)
 
             tmp = doc.add_table(rows=1 + len(rows), cols=len(cols))
             tmp.autofit = True
