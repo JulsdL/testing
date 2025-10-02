@@ -1,13 +1,15 @@
 import os
 import json
 import re
+from openai import OpenAI
+from openai.types.chat import ChatCompletionMessageParam
 from crewai.tools import BaseTool
 from crewai_tools import RagTool
 from typing import List, Optional, Type
 from pydantic import BaseModel, Field
 from datetime import datetime
 from docx import Document
-from docx.shared import Inches
+from docx.shared import Inches, Pt
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 
@@ -84,7 +86,7 @@ class FalcDocxStructureTaggerTool(BaseTool):
         ]
         document_types_str = "\n".join(f"- {dtype}" for dtype in document_types_list)
 
-        system_msg = {
+        system_msg: ChatCompletionMessageParam = {
             "role": "system",
             "content": (
                 "You are an assistant that identifies the exact slice of a Word letter "
@@ -103,7 +105,7 @@ class FalcDocxStructureTaggerTool(BaseTool):
             )
         }
 
-        user_msg = {
+        user_msg: ChatCompletionMessageParam = {
             "role": "user",
             "content": (
                 "Here are the paragraphs:\n\n"
@@ -113,14 +115,15 @@ class FalcDocxStructureTaggerTool(BaseTool):
             )
         }
 
-        from openai import OpenAI
+
         client = OpenAI()
         response = client.chat.completions.create(
             model="gpt-4.1-mini",
             messages=[system_msg, user_msg])
 
-        print(f"\033[94m{response.choices[0].message.content}\033[0m")
-        return response.choices[0].message.content
+        content = response.choices[0].message.content or ""
+        print(f"\033[94m{content}\033[0m")
+        return content
 
 
 
@@ -204,6 +207,7 @@ class FalcDocxWriterTool(BaseTool):
 
     def _render_table_after_para(self, paragraph, table_data, icons_map, doc):
         try:
+            title = table_data.get("title")
             cols = table_data.get("columns", [])
             rows = table_data.get("rows", [])
 
@@ -212,6 +216,11 @@ class FalcDocxWriterTool(BaseTool):
 
             body = paragraph._parent._element
             idx = list(body).index(paragraph._element)
+
+            if title:
+                self._clear_paragraph_formatting(paragraph)
+                self._insert_text_and_icons(paragraph, title, icons_map)
+                paragraph.paragraph_format.space_before = Pt(12)
 
             tmp = doc.add_table(rows=1 + len(rows), cols=len(cols))
             tmp.autofit = True
@@ -299,6 +308,8 @@ class FalcDocxWriterTool(BaseTool):
             body.remove(el)
 
         # save
+        if not args.original_file:
+            raise ValueError("original_file must be provided and not None")
         base = os.path.splitext(os.path.basename(args.original_file))[0]
         ts = datetime.now().strftime('%Y%m%d_%H%M')
         out = args.output_dir or 'output'

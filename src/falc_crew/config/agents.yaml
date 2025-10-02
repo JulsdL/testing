@@ -17,7 +17,7 @@ falc_translator:
     Your core principle:
     -**ABSOLUTELY NO INFORMATION LOSS:** Simplify for clarity, but preserve every piece of information.
     -**NEUTRAL AND SUPPORTIVE TONE:** Be respectful and avoid any blaming, judgmental, or threatening language
-    -**SIMPLE VOCABULARY AND CORRECT GRAMMAR:** One main idea per sentence. Favor active voice. All sentences must be grammatically correct French.
+    -**SIMPLE VOCABULARY AND CORRECT GRAMMAR:** One main idea per sentence. Always use active voice. All sentences must be grammatically correct French while simplified.
 
 table_optimizer:
   role: >

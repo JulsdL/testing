@@ -1,5 +1,46 @@
 # Changelog
 
+## [0.1.2] - 2025-10-2
+
+### Added
+- **Strict 'No Duplicates or Omissions' Rule:**
+  In the `tasks.yaml` instructions, translators must now ensure that no information is duplicated or omitted during FALC simplification.
+- **Positive & Consistent Language Editorial Guidelines:**
+  - Mandated use of positive phrasing and disallowing the start of a sentence with "Ou", "Alors", "Donc", or "Si" (except for "Question ? Alors..." structure).
+  - Prohibition against repeating the subject of the letter in the first sentence.
+  - Extension and clarification of isosemie (consistent vocabulary) – when a word is chosen for a concept, synonyms cannot be used elsewhere in the document.
+  - Expanded on the "no end-of-document summaries" rule.
+- **Checklist Enhancement:**
+  - Ensured conditionnel/subjunctive moods and "si" clauses without the proper conversion are disallowed.
+  - Must avoid duplicated information and guarantee professional-level grammar.
+
+### Changed
+- **Unified Table Simplification Rule with Icon Prepending:**
+  - When a question is followed by an answer (or answers), all content must be turned into a single-column table.
+  - The question becomes the table title, answers become table rows, and column headers are always hidden (`hide_column_headers: true`).
+  - For each table row, applicable icons must be prepended to the answer using placeholder syntax (e.g., `[[ICON:...]]`), with new concrete example templates included for clarity.
+- **Expanded Table Transformation Examples and Procedures:**
+  - Added methodology and explicit step-by-step process, covering single-answer and list-based tables, as well as how to insert tables and placeholder references.
+- **Improved Phrasing in Task and Agent Instructions:**
+  - All grammar, syntax, and style instructions in `tasks.yaml`, `agents.yaml`, and `falc_guidelines.md` have been revised for clarity, scope, and precision.
+  - Agent instructions now specify: always use active voice; one idea per sentence; maintain grammatical correctness even when simplifying.
+
+### Fixed
+- **Potential Save Error in Code:**
+  - `custom_tool.py` now raises a clear error if `original_file` is `None` before attempting to save, preventing silent file output errors.
+
+### Improved
+- **Code Type Annotations and Null Safety (`custom_tool.py`):**
+  - Added explicit type annotations for OpenAI chat message parameters.
+  - Streamlined response handling to ensure that the output is never null/None.
+- **Table Rendering Workflow:**
+  - When rendering a table, if it has a title, the code now clears the formatting of the relevant paragraph, inserts the title with icons, and sets additional spacing for professional appearance.
+
+### Documentation
+- **FALC Editorial Guide Updates:**
+  - `falc_guidelines.md` now in line with the expanded style and content rules from `tasks.yaml`.
+  - Examples for positive phrasing, isosemie, and forbidden sentence starters have been added for extra clarity.
+
 ## [0.1.1] - 2025-07-11
 
 ### Changed

@@ -8,12 +8,23 @@ translate_text_task:
     - If information seems redundant, rephrase it differently to reinforce understanding instead of removing it
     - Ensure the entire provided document is processed and simplified
     - Reformulate for clarity and simplicity while maintaining message completeness
+    - Make sure no information is duplicated or omitted
 
     **VERY IMPORTANT: You MUST consult and meticulously apply ALL rules from the 'Règles d'édition FALC' document (available in your knowledge base) for every sentence you write.**
     This includes specific instructions for sentence structure, vocabulary, numbers, dates, lists, complex structures (conditions, cause/effect, etc.), and forbidden phrases.
-    Pay special attention to the rule: "Si une phrase commence par 'si', poser la condition sous forme de question puis répondre avec 'Alors...'."
+    Pay special attention to the rule: "Lorsqu'une phrase commence par 'si', transformer pour poser la condition sous forme de question puis répondre"
 
-    **All output sentences must be grammatically correct French, even when simplified.**
+    **KEY STYLE AND CONTENT RULES TO FOLLOW:**
+    - **No Summaries:** Absolutely do not add a summary or recap that would duplicate previous text at the end of the document. The translation must end after the last piece of information.
+    - **Consistent Vocabulary (Isosemie):** Be extremely consistent with your choice of words. If you translate a term one way (e.g., "logement"), you must use that same word throughout the entire document. Do not use synonyms like "bail" or "appartement".
+    - **Sentence Starters:** Do not start sentences with "Ou", "Alors", or "Donc". The only exception is the "Question? Alors..." pattern for conditions.
+    - **No Subject Repetition:** Do not repeat the letter's subject in the first sentence. The first sentence should state the document's purpose directly.
+    - **Positive Phrasing:** Always prefer positive sentences. For example, instead of "Qui peut vous aider si vous avez des questions ?", write "Vous avez des questions ?".
+    - **Direct Phrasing for Lists:** When listing items like rules or obligations, write each item as a complete, self-sufficient sentence. Do NOT create redundant "label: description" pairs.
+        - **BAD:** `Garder la carte: Vous devez garder votre carte d'accès aux soins « EVAM » sur vous en permanence.`
+        - **GOOD:** `Vous devez garder votre carte d'accès aux soins « EVAM » sur vous en permanence.`
+
+    **All output sentences must be grammatically correct, even when simplified.**
 
     1. First, consult the available icons list:
       {icon_list}
@@ -51,10 +62,13 @@ translate_text_task:
     **VERIFICATION CHECKLIST:**
     Before finalizing your translation, verify that:
     - All names, dates, amounts, and addresses from the original are present
+    - No sentence are left in conditionnel or subjunctive mood, no "si" clauses without question format
     - All conditions and obligations are clearly stated
     - All procedural steps are included
     - The entire document has been processed
     - Nothing has been omitted or oversimplified to the point of information loss
+    - There are no duplicated information
+    - French syntax and grammar MUST BE profesionally correct
 
     **FINAL VERIFICATION STEP USING FALC CHECKLIST:**
     Before concluding, review your output against the 33 criteria in the 'Check-list de vérification' from the 'Règles d'édition FALC to Confirm that your text aligns with these criteria, especially regarding word choice, sentence structure, formatting and grammatical correctness.
@@ -75,7 +89,7 @@ translate_text_task:
     """{
       "header": null,
       "recipient": "Madame",
-      "subject": "Confirmation de votre participation au programme de formation et de pratique professionnelle – Session octobre 2019",
+      "subject": "Confirmation de votre participation au programme de formation et de pratique professionnelle - Session octobre 2019",
       "body_sections": [
         "Nous confirmons votre inscription au programme de formation et de pratique professionnelle en santé.",
         "Quand ?",
@@ -129,6 +143,61 @@ table_optimizer_task:
     Review the FALC translator's `body_sections` and identify opportunities to restructure content into tables for improved clarity and readability, then define the table data.
     **VERY IMPORTANT: The final `body_sections` list you output MUST contain ALL original content that was NOT converted into a table, PLUS the `[[TABLE:key]]` placeholders for any tables you created. All items must be in their correct original relative order.**
 
+    **CRITICAL RULE: Unified Table Creation from Questions**
+    When you encounter a question in the text followed by one or more paragraphs that answer it, you MUST convert this block into a single, unified table structure.
+    When transforming a content into a table, NEVER introduce conditional or subjunctive mood. Always rephrase conditions as direct questions followed by clear answers.
+    **NEVER** introduce "si" clauses or conditional phrasing in the table content.
+    You MUST use the text given by the FALC translator as-is, without altering the meaning or omitting any information.
+
+    **Procedure:**
+    1.  **Use the question as the `title` for the table.** This applies to ALL question-based tables, whether the answer is a single sentence or a list.
+    2.  The table MUST be structured with a **single column**.
+    3.  Each answer paragraph becomes a row in this single column.
+    4.  You **MUST set `hide_column_headers: true`**. The title provides all the necessary context.
+    5.  The original question and all answer paragraphs must be removed from the `body_sections` and replaced with a single `[[TABLE:key]]` placeholder.
+
+    ---
+    **Icon Handling for Single-Column Tables:**
+    For each row you create, you MUST check if the sentence's content corresponds to one of the available icons. If it does, you **MUST prepend the `[[ICON:key]]` placeholder** to the beginning of the sentence within the cell. Use your judgment to add icons where they add clarity.
+    Examples of appropriate icon usage:
+    **Obligations & Duties:** For sentences describing a duty or obligation (e.g., using verbs like "devoir", "falloir", "être obligé de"), use [[ICON:respect_reglement]].
+    - **Payments & Money:** For sentences involving money, payments, amounts in francs, or invoices, use [[ICON:argent_indemnite]] or [[ICON:facture_a_payer]].
+    - **Deadlines & Dates:** For sentences mentioning a specific date, deadline, or timeframe, use [[ICON:calendrier_heure_date]].
+    - **Appointments:** For sentences about appointments or meetings, use [[ICON:rendez_vous]].
+    - **Documents & Paperwork:** When the text asks to provide a document, a certificate, or a contract, use [[ICON:donner_documents_certificat]].
+    - **Warnings & Important Notices:** For critical information, warnings, or consequences, use [[ICON:attention_avertissement]].
+
+    *   **Available Icons:** {icon_list}
+
+    ---
+    **Example 1: Single Answer**
+    *   **Initial Text:** `"Qui paie les lunettes ?", "L'EVAM paie les frais..."`
+    *   **Correct Table Output:**
+
+          "key": "paiement_lunettes",
+          "title": "Qui paie les lunettes ?",
+          "columns": [""],
+          "rows": [
+            ["[[ICON:payer_argent_facture]] L'EVAM paie les frais..."]
+          ],
+          "hide_column_headers": true
+
+
+    **Example 2: List of Obligations**
+    *   **Initial Text:** `"Quelles sont vos obligations ?", "Vous devez toujours garder votre carte...", "Vous devez montrer votre carte..."`
+    *   **Correct Table Output:**
+
+          "key": "obligations_lunettes",
+          "title": "Quelles sont vos obligations ?",
+          "columns": [""],
+          "rows": [
+            ["[[ICON:attention_avertissement]] Vous devez toujours garder votre carte..."],
+            ["[[ICON:assurance_maladie]] Vous devez montrer votre carte..."]
+          ],
+          "hide_column_headers": true
+
+    ---
+
      **1. Identify Content Suitable for Tables:**
       Actively look for various types of information that would benefit from a tabular presentation, such as:
       - **Comparisons:** Options, features, pros/cons.
@@ -157,8 +226,7 @@ table_optimizer_task:
           - Columns: ["Où", "Quand", "Détails"]
           - Rows for each day and time slot
 
-        **Do not create a table for a single row or single column of data** unless it is part of a larger set of related information.
-        **Rows only** if both label and value exist in the text (do **not** create empty rows)
+        **DO not create empty rows**
 
      **2. Table Creation Process:**
       When you identify a block of text suitable for a table:
@@ -218,7 +286,7 @@ table_optimizer_task:
     """{
       "header": null,
       "recipient": "Madame",
-      "subject": "Confirmation de votre participation au programme de formation et de pratique professionnelle – Session octobre 2019",
+      "subject": "Confirmation de votre participation au programme de formation et de pratique professionnelle - Session octobre 2019",
       "body_sections": [
         "Nous confirmons votre inscription au programme de formation et de pratique professionnelle en santé.",
         "[[TABLE:meeting]]",

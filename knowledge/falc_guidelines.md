@@ -13,14 +13,18 @@ Expliquer chaque information de façon claire et simple pour que toute personne 
 - Phrases courtes.
 - Voix active.
 - Temps présent quand c’est possible.
-- Formulations positives (mettre **pas** en gras si nécessaire).
+- **Formulations positives.**
+  - **Tournure à éviter :** "Qui peut vous aider si vous avez des questions ?"
+  - **Tournure à privilégier :** "Vous avez des questions ?"
+  - Si une négation est indispensable, mettre le mot **pas** en gras.
+- **Ne pas commencer une phrase par "Ou", "Alors", "Donc" ou "Si".**
+  - **Exception :** La structure "Question ? Alors..." est autorisée pour poser une condition.
 - Pas de phrases hypothétiques.
-- ***Si une phrase commence par « si », poser la condition sous forme de question puis répondre avec « Alors… ».***
 
 ### 2.2 Mots
 - Mots simples, connus, adaptés au lecteur.
-- Même mot pour la même chose (isosemie).
-- Pas de jargon ni mots étrangers.
+- **Toujours utiliser le même mot pour la même chose (isosemie).** Par exemple, si vous choisissez le mot "logement", utilisez-le dans tout le document et ne le remplacez pas par "bail" ou "appartement".
+- **Pas de jargon ni de mots étrangers.** Éviter les termes juridiques complexes comme "résiliation" ou "anticipée". Si un mot complexe est indispensable, il faut l'expliquer simplement.
 - Pas d’abréviations.
 - Expliquer un mot difficile au moment où il apparaît.
 - Donner des exemples concrets.
@@ -51,8 +55,9 @@ Expliquer chaque information de façon claire et simple pour que toute personne 
 ## 3. Organisation du contenu
 - Regrouper chaque sujet dans une section unique.
 - Titres et sous‑titres sous forme de questions (« Quand ? », « Où ? », « Pourquoi ? », « Que faire ? »).
-- Expliquer l’objectif du document au début.
+- **Expliquer l’objectif du document au début.** Ne pas répéter l'objet du courrier dans la première phrase.
 - Placer les informations les plus importantes en premier, en gras ou dans un encadré.
+- **Ne jamais ajouter de récapitulatif ou de résumé à la fin du document.** Le document doit être concis.
 - Glossaire en fin de long document.
 
 ## 4. Tableaux et icônes
