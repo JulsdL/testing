@@ -204,6 +204,7 @@ class FalcDocxWriterTool(BaseTool):
 
     def _render_table_after_para(self, paragraph, table_data, icons_map, doc):
         try:
+            title = table_data.get("title")
             cols = table_data.get("columns", [])
             rows = table_data.get("rows", [])
 
@@ -212,6 +213,10 @@ class FalcDocxWriterTool(BaseTool):
 
             body = paragraph._parent._element
             idx = list(body).index(paragraph._element)
+
+            if title:
+                self._clear_paragraph_formatting(paragraph)
+                self._insert_text_and_icons(paragraph, title, icons_map)
 
             tmp = doc.add_table(rows=1 + len(rows), cols=len(cols))
             tmp.autofit = True
