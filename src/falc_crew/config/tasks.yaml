@@ -159,6 +159,13 @@ table_optimizer_task:
     ---
     **Icon Handling for Single-Column Tables:**
     For each row you create, you MUST check if the sentence's content corresponds to one of the available icons. If it does, you **MUST prepend the `[[ICON:key]]` placeholder** to the beginning of the sentence within the cell. Use your judgment to add icons where they add clarity.
+    Examples of appropriate icon usage:
+    **Obligations & Duties:** For sentences describing a duty or obligation (e.g., using verbs like "devoir", "falloir", "être obligé de"), use [[ICON:respect_reglement]].
+    - **Payments & Money:** For sentences involving money, payments, amounts in francs, or invoices, use [[ICON:argent_indemnite]] or [[ICON:facture_a_payer]].
+    - **Deadlines & Dates:** For sentences mentioning a specific date, deadline, or timeframe, use [[ICON:calendrier_heure_date]].
+    - **Appointments:** For sentences about appointments or meetings, use [[ICON:rendez_vous]].
+    - **Documents & Paperwork:** When the text asks to provide a document, a certificate, or a contract, use [[ICON:donner_documents_certificat]].
+    - **Warnings & Important Notices:** For critical information, warnings, or consequences, use [[ICON:attention_avertissement]].
 
     *   **Available Icons:** {icon_list}
 
