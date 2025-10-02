@@ -304,6 +304,8 @@ class FalcDocxWriterTool(BaseTool):
             body.remove(el)
 
         # save
+        if not args.original_file:
+            raise ValueError("original_file must be provided and not None")
         base = os.path.splitext(os.path.basename(args.original_file))[0]
         ts = datetime.now().strftime('%Y%m%d_%H%M')
         out = args.output_dir or 'output'
