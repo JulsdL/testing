@@ -19,8 +19,8 @@ translate_text_task:
     - **No Subject Repetition:** Do not repeat the letter's subject in the first sentence. The first sentence should state the document's purpose directly.
     - **Positive Phrasing:** Always prefer positive sentences. For example, instead of "Qui peut vous aider si vous avez des questions ?", write "Vous avez des questions ?".
     - **Direct Phrasing for Lists:** When listing items like rules or obligations, write each item as a complete, self-sufficient sentence. Do NOT create redundant "label: description" pairs.
-        - **BAD:** `Garder la carte: Vous devez garder votre carte d'accès aux soins « EVAM » sur vous en permanence.`
-        - **GOOD:** `Vous devez garder votre carte d'accès aux soins « EVAM » sur vous en permanence.`
+        - **BAD:** `Garder la carte: Vous devez garder votre carte d’accès aux soins « EVAM » sur vous en permanence.`
+        - **GOOD:** `Vous devez garder votre carte d’accès aux soins « EVAM » sur vous en permanence.`
 
     **All output sentences must be grammatically correct French, even when simplified.**
 
@@ -84,7 +84,7 @@ translate_text_task:
     """{
       "header": null,
       "recipient": "Madame",
-      "subject": "Confirmation de votre participation au programme de formation et de pratique professionnelle - Session octobre 2019",
+      "subject": "Confirmation de votre participation au programme de formation et de pratique professionnelle – Session octobre 2019",
       "body_sections": [
         "Nous confirmons votre inscription au programme de formation et de pratique professionnelle en santé.",
         "Quand ?",
@@ -138,53 +138,54 @@ table_optimizer_task:
     Review the FALC translator's `body_sections` and identify opportunities to restructure content into tables for improved clarity and readability, then define the table data.
     **VERY IMPORTANT: The final `body_sections` list you output MUST contain ALL original content that was NOT converted into a table, PLUS the `[[TABLE:key]]` placeholders for any tables you created. All items must be in their correct original relative order.**
 
-    **NEW CRITICAL RULE: Advanced Table Structuring**
-    When you encounter a question in the text that is followed by content you intend to turn into a table, you MUST identify which of the two following patterns it matches and apply the correct procedure.
+    **NEW CRITICAL RULE: Unified Table Creation from Questions**
+    When you encounter a question in the text followed by one or more paragraphs that answer it, you MUST convert this block into a single, unified table structure.
+
+    **Procedure:**
+    1.  **Use the question as the `title` for the table.** This applies to ALL question-based tables, whether the answer is a single sentence or a list.
+    2.  The table MUST be structured with a **single column**.
+    3.  Each answer paragraph becomes a row in this single column.
+    4.  You **MUST set `hide_column_headers: true`**. The title provides all the necessary context.
+    5.  The original question and all answer paragraphs must be removed from the `body_sections` and replaced with a single `[[TABLE:key]]` placeholder.
 
     ---
-    **Pattern 1: Simple Question & Answer (Key-Value Table)**
+    **Icon Handling for Single-Column Tables:**
+    For each row you create, you MUST check if the sentence's content corresponds to one of the available icons. If it does, you **MUST prepend the `[[ICON:key]]` placeholder** to the beginning of the sentence within the cell. Use your judgment to add icons where they add clarity.
 
-    *   **When to use:** This pattern applies when a question is followed by a single, direct paragraph of text as an answer.
-    *   **Procedure:**
-        1.  Create a table with **NO `title`** (set `title: null`).
-        2.  Set `hide_column_headers: true`.
-        3.  The `rows` data must be a single list containing two items: `[[<question_text>, <answer_text>]]`.
-        4.  Both the question and the answer paragraphs must be removed from the `body_sections` and replaced with a single `[[TABLE:key]]`.
+    *   **Available Icons:** {icon_list}
 
-    *   **Example Transformation:**
-        *   **Initial Text:** `"Qui paie les lunettes ?", "L'EVAM paie les frais..."`
-        *   **Correct Table Output:**
-              "key": "paiement_lunettes",
-              "title": null,
-              "columns": ["", ""],
-              "rows": [
-                ["Qui paie les lunettes ?", "L'EVAM paie les frais..."]
-              ],
-              "hide_column_headers": true
     ---
-    **Pattern 2: Question & List of Sentences (Single-Column Titled Table)**
+    **Example 1: Single Answer**
+    *   **Initial Text:** `"Qui paie les lunettes ?", "L’EVAM paie les frais..."`
+    *   **Correct Table Output:**
+        ```json
+        {
+          "key": "paiement_lunettes",
+          "title": "Qui paie les lunettes ?",
+          "columns": [""],
+          "rows": [
+            ["[[ICON:payer_argent_facture]] L’EVAM paie les frais..."]
+          ],
+          "hide_column_headers": true
+        }
+        ```
 
-    *   **When to use:** This pattern applies when a question is followed by a list of complete, self-sufficient sentences (e.g., a list of rules or obligations).
-    *   **Procedure:**
-        1.  Use the question itself as the `title` for the table.
-        2.  Create a table with a **single column**.
-        3.  The `rows` should contain the list of sentences, where each sentence is a single-cell row.
-        4.  You **MUST set `hide_column_headers: true`**. The title provides all the necessary context.
-        5.  The question paragraph and all the list item paragraphs must be removed from `body_sections` and replaced with a single `[[TABLE:key]]`.
-
-    *   **Example Transformation:**
-        *   **Initial Text:** `"Quelles sont vos obligations ?", "Vous devez garder votre carte...", "Vous devez présenter votre carte..."`
-        *   **Correct Table Output:**
-              "key": "obligations_lunettes",
-              "title": "Quelles sont vos obligations ?",
-              "columns": [""],
-              "rows": [
-                ["Vous devez garder votre carte..."],
-                ["Vous devez présenter votre carte..."]
-              ],
-              "hide_column_headers": true
+    **Example 2: List of Obligations**
+    *   **Initial Text:** `"Quelles sont vos obligations ?", "Vous devez toujours garder votre carte...", "Vous devez montrer votre carte..."`
+    *   **Correct Table Output:**
+        ```json
+        {
+          "key": "obligations_lunettes",
+          "title": "Quelles sont vos obligations ?",
+          "columns": [""],
+          "rows": [
+            ["[[ICON:attention_avertissement]] Vous devez toujours garder votre carte..."],
+            ["[[ICON:assurance_maladie]] Vous devez montrer votre carte..."]
+          ],
+          "hide_column_headers": true
+        }
+        ```
     ---
-    **Crucial:** You must correctly identify the pattern and apply the corresponding procedure. The goal is to produce clean, non-redundant tables by structuring the text correctly from the start.
 
      **1. Identify Content Suitable for Tables:**
       Actively look for various types of information that would benefit from a tabular presentation, such as:
@@ -275,7 +276,7 @@ table_optimizer_task:
     """{
       "header": null,
       "recipient": "Madame",
-      "subject": "Confirmation de votre participation au programme de formation et de pratique professionnelle - Session octobre 2019",
+      "subject": "Confirmation de votre participation au programme de formation et de pratique professionnelle – Session octobre 2019",
       "body_sections": [
         "Nous confirmons votre inscription au programme de formation et de pratique professionnelle en santé.",
         "[[TABLE:meeting]]",
@@ -342,6 +343,7 @@ table_optimizer_task:
         }
       ]
     """
+
 
   agent: table_optimizer
 
