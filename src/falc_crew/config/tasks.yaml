@@ -19,8 +19,8 @@ translate_text_task:
     - **No Subject Repetition:** Do not repeat the letter's subject in the first sentence. The first sentence should state the document's purpose directly.
     - **Positive Phrasing:** Always prefer positive sentences. For example, instead of "Qui peut vous aider si vous avez des questions ?", write "Vous avez des questions ?".
     - **Direct Phrasing for Lists:** When listing items like rules or obligations, write each item as a complete, self-sufficient sentence. Do NOT create redundant "label: description" pairs.
-        - **BAD:** `Garder la carte: Vous devez garder votre carte d’accès aux soins « EVAM » sur vous en permanence.`
-        - **GOOD:** `Vous devez garder votre carte d’accès aux soins « EVAM » sur vous en permanence.`
+        - **BAD:** `Garder la carte: Vous devez garder votre carte d'accès aux soins « EVAM » sur vous en permanence.`
+        - **GOOD:** `Vous devez garder votre carte d'accès aux soins « EVAM » sur vous en permanence.`
 
     **All output sentences must be grammatically correct French, even when simplified.**
 
@@ -84,7 +84,7 @@ translate_text_task:
     """{
       "header": null,
       "recipient": "Madame",
-      "subject": "Confirmation de votre participation au programme de formation et de pratique professionnelle – Session octobre 2019",
+      "subject": "Confirmation de votre participation au programme de formation et de pratique professionnelle - Session octobre 2019",
       "body_sections": [
         "Nous confirmons votre inscription au programme de formation et de pratique professionnelle en santé.",
         "Quand ?",
@@ -152,19 +152,15 @@ table_optimizer_task:
         4.  Both the question and the answer paragraphs must be removed from the `body_sections` and replaced with a single `[[TABLE:key]]`.
 
     *   **Example Transformation:**
-        *   **Initial Text:** `"Qui paie les lunettes ?", "L’EVAM paie les frais..."`
+        *   **Initial Text:** `"Qui paie les lunettes ?", "L'EVAM paie les frais..."`
         *   **Correct Table Output:**
-            ```json
-            {
               "key": "paiement_lunettes",
               "title": null,
               "columns": ["", ""],
               "rows": [
-                ["Qui paie les lunettes ?", "L’EVAM paie les frais..."]
+                ["Qui paie les lunettes ?", "L'EVAM paie les frais..."]
               ],
               "hide_column_headers": true
-            }
-            ```
     ---
     **Pattern 2: Question & List of Sentences (Single-Column Titled Table)**
 
@@ -179,8 +175,6 @@ table_optimizer_task:
     *   **Example Transformation:**
         *   **Initial Text:** `"Quelles sont vos obligations ?", "Vous devez garder votre carte...", "Vous devez présenter votre carte..."`
         *   **Correct Table Output:**
-            ```json
-            {
               "key": "obligations_lunettes",
               "title": "Quelles sont vos obligations ?",
               "columns": [""],
@@ -189,8 +183,6 @@ table_optimizer_task:
                 ["Vous devez présenter votre carte..."]
               ],
               "hide_column_headers": true
-            }
-            ```
     ---
     **Crucial:** You must correctly identify the pattern and apply the corresponding procedure. The goal is to produce clean, non-redundant tables by structuring the text correctly from the start.
 
@@ -283,7 +275,7 @@ table_optimizer_task:
     """{
       "header": null,
       "recipient": "Madame",
-      "subject": "Confirmation de votre participation au programme de formation et de pratique professionnelle – Session octobre 2019",
+      "subject": "Confirmation de votre participation au programme de formation et de pratique professionnelle - Session octobre 2019",
       "body_sections": [
         "Nous confirmons votre inscription au programme de formation et de pratique professionnelle en santé.",
         "[[TABLE:meeting]]",
@@ -350,7 +342,6 @@ table_optimizer_task:
         }
       ]
     """
-
 
   agent: table_optimizer
 
