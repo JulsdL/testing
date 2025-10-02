@@ -24,7 +24,7 @@ translate_text_task:
         - **BAD:** `Garder la carte: Vous devez garder votre carte d'accès aux soins « EVAM » sur vous en permanence.`
         - **GOOD:** `Vous devez garder votre carte d'accès aux soins « EVAM » sur vous en permanence.`
 
-    **All output sentences must be grammatically correct and professional French, even when simplified.**
+    **All output sentences must be grammatically correct, even when simplified.**
 
     1. First, consult the available icons list:
       {icon_list}
